@@ -8,6 +8,7 @@ import Homepage from './pages/Homepage'
 import Blog from './pages/Blog'
 import Rootlayout from './pages/Rootlayout'
 import NotFound from './pages/NotFound'
+import AddBlog from './pages/AddBlog'
 
 
 
@@ -24,8 +25,12 @@ function App() {
         },
 
         {
-          path: 'blog',
+          path: '/blog',
           element: <Blog />
+        },
+        {
+          path: '/addblog',
+          element: <AddBlog />
         }
       ]
 
