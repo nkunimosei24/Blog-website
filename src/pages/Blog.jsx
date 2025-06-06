@@ -78,7 +78,6 @@ const Blog = () => {
                     />
                     <MdDeleteForever
                       onClick={(e) => {
-                        e.stopPropagation()
                         handleDelete(blog.id)
                       }}
                       className="cursor-pointer hover:text-red-600"
