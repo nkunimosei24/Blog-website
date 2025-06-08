@@ -26,18 +26,54 @@ const Blog = () => {
     fetchBlogs()
   }, [])
 
+
+
   async function handleDelete(id) {
     const confirmDelete = confirm('Are you sure you want to delete?')
     if (!confirmDelete) return
     try {
       await axios.delete(`${API_URL}/${id}`)
       setBlogs((prev) => prev.filter((blog) => blog.id !== id))
+
+      const updatedFavs = favorite.filter((fav) => fav.id !== id)
+      setFavorite(updatedFavs)
+      sessionStorage.setItem('favorite', JSON.stringify(updatedFavs))
+
       setLoading(false)
     } catch (error) {
       console.log(error)
       setLoading(false)
     }
   }
+
+
+  const isFavorite = (id) => {
+    return favorite.some(fav => fav.id === id)
+  }
+
+
+  const makeFav = (blog) => {
+    const existing = JSON.parse(sessionStorage.getItem('favorite')) || []
+
+    const isAlreadyFavorite = favorite.some(fav => fav.id === blog.id)
+
+    let updatedFavs;
+
+    if (isAlreadyFavorite) {
+      updatedFavs = (existing.filter(fav => fav.id !== blog.id))
+    } else {
+      updatedFavs = ([...existing, blog])
+    }
+
+    setFavorite(updatedFavs)
+    sessionStorage.setItem('favorite', JSON.stringify(updatedFavs))
+  }
+
+
+  useEffect(() => {
+    const storedFavs = JSON.parse(sessionStorage.getItem('favorite')) || []
+    setFavorite(storedFavs)
+  }, [blogs])
 
 
   return (
@@ -72,10 +108,20 @@ const Blog = () => {
                   </div>
                   <div className="flex gap-3 mt-1 text-xl text-gray-600">
                     <MdOutlineFavorite
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        makeFav(blog)
+                      }}
+                      className={`cursor-pointer  ${isFavorite(blog.id)
+                        ? 'text-red-500'
+                        : 'text-gray-600'} `}
                     />
-                    <FaRegEdit
+                    {/* <FaRegEdit
+                      onClick={(e) => {
+                        e.stopPropagation()
+                      }}
                       className="cursor-pointer hover:text-pink-800"
-                    />
+                    /> */}
                     <MdDeleteForever
                       onClick={(e) => {
                         handleDelete(blog.id)
@@ -90,7 +136,7 @@ const Blog = () => {
 
 
           {blogs.length > 0 && (
-            <div className="md:w-1/3 bg-white shadow-md rounded-md p-4 h-fit">
+            <div className="md:w-2/3 bg-white shadow-md rounded-md p-4 h-fit">
               {selectedBlog ? (
                 <div>
                   <h3 className="font-bold text-xl text-pink-800 mb-2">
